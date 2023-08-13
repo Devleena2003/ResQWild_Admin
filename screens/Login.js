@@ -15,6 +15,23 @@ const Login = ({ navigation }) => {
   const [show, setShow] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(true);
 
+  const login = async () => {
+    let req;
+    try {
+      req = {
+        email: email,
+        password: password,
+      };
+      const res = await loginUser(req);
+      await SecureStore.setItemAsync("secure_token", res.data.token);
+      const token = await SecureStore.getItemAsync("secure_token");
+      console.log("token", token);
+      navigation.navigate("Home");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.header}>Welcome Back!</Text>
@@ -24,43 +41,27 @@ const Login = ({ navigation }) => {
       </View>
       <View style={styles.inputContainer}>
         <Text style={styles.inputHeader}>Password</Text>
-        <View
-          style={[
-            styles.inputContainer,
-            {
-              width: "100%",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              borderWidth: 2,
-              borderColor: "#1e5128",
-              borderRadius: 20,
-              paddingHorizontal: 15,
-              paddingBottom: 10,
-              paddingTop: 10,
-            },
-          ]}
+
+        <TextInput
+          style={styles.input}
+          value={password}
+          secureTextEntry={passwordVisible}
+          onChangeText={(text) => setpassword(text)}
+        />
+        <TouchableOpacity
+          style={styles.btnEye}
+          onPress={() => {
+            setPasswordVisible(!passwordVisible);
+            setShow(!show);
+          }}
         >
-          <TextInput
-            style={{}}
-            value={password}
-            secureTextEntry={passwordVisible}
-            onChangeText={setpassword}
+          <MaterialCommunityIcons
+            name={show === false ? "eye-outline" : "eye-off-outline"}
+            size={20}
+            color={"#0F6408"}
           />
-          <TouchableOpacity
-            style={styles.btnEye}
-            onPress={() => {
-              setPasswordVisible(!passwordVisible);
-              setShow(!show);
-            }}
-          >
-            <MaterialCommunityIcons
-              name={show === false ? "eye-outline" : "eye-off-outline"}
-              size={20}
-              color={"#0F6408"}
-            />
-          </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
+
         <TouchableOpacity>
           <Text
             style={{
@@ -76,10 +77,7 @@ const Login = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity
-        style={styles.btn}
-        onPress={() => navigation.navigate("Welcome")}
-      >
+      <TouchableOpacity style={styles.btn} onPress={login}>
         <Text style={styles.btnText}>Login</Text>
       </TouchableOpacity>
       <View
@@ -146,6 +144,11 @@ const styles = StyleSheet.create({
     fontSize: 22,
     color: "white",
     fontWeight: "bold",
+  },
+  btnEye: {
+    position: "absolute",
+    right: 25,
+    top: 50,
   },
 });
 

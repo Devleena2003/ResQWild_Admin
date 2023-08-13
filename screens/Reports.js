@@ -7,13 +7,27 @@ import {
   Modal,
   Button,
 } from "react-native";
-import React, { useState } from "react";
-import ReportsData from "../assets/ReportsData";
+import React, { useState, useEffect } from "react";
+
 import { useNavigation } from "@react-navigation/native";
-const ReportCard = (props) => {
+import { getAllReport } from "../services/api.reports";
+const ReportCard = () => {
   const navigation = useNavigation();
-  const { title, user, time, desc } = props;
+
   const [modalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    fetchAllEvents();
+  }, []);
+
+  const fetchAllEvents = async () => {
+    try {
+      const res = await getAllReport();
+      console.log(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <View style={styles.container}>
       <View
@@ -23,16 +37,18 @@ const ReportCard = (props) => {
           alignItems: "center",
         }}
       >
-        <Text style={{ fontSize: 25, color: "#1e5128", fontWeight: "bold" }}>
-          {title}
-        </Text>
-        <Text style={{ fontSize: 15, color: "#1e5128" }}>{time}</Text>
+        <Text
+          style={{ fontSize: 25, color: "#1e5128", fontWeight: "bold" }}
+        ></Text>
+        <Text style={{ fontSize: 15, color: "#1e5128" }}></Text>
       </View>
-      <Text style={{ fontSize: 17 }}>Reported by {user}</Text>
+      <Text style={{ fontSize: 17 }}>Reported by </Text>
       <View style={{ flexDirection: "row", gap: 10 }}>
         <TouchableOpacity
           style={styles.btn}
-          onPress={() => setModalVisible(true)}
+          onPress={() => {
+            setModalVisible(true);
+          }}
         >
           <Text style={styles.btnText}>View Details</Text>
         </TouchableOpacity>
@@ -67,13 +83,15 @@ const ReportCard = (props) => {
         animationType="slide"
         transparent={true}
         visible={modalVisible}
-        onRequestClose={() => {
+        onRequestClose={async () => {
           Alert.alert("Modal has been closed.");
-          setModalVisible(!modalVisible);
+          await setModalVisible(!modalVisible);
+          await handleReport();
         }}
       >
         <View style={styles.modalView}>
-          <Text style={{ fontSize: 17 }}>{desc}</Text>
+          <Text>title</Text>
+          <Text style={{ fontSize: 17 }}>des</Text>
           <TouchableOpacity
             style={styles.btn}
             onPress={() => setModalVisible(false)}
@@ -86,26 +104,26 @@ const ReportCard = (props) => {
   );
 };
 
-const Reports = () => {
-  return (
-    <View>
-      <FlatList
-        data={ReportsData}
-        renderItem={({ item }) => (
-          <ReportCard
-            title={item.title}
-            time={item.time}
-            user={item.user}
-            desc={item.desc}
-          />
-        )}
-        keyExtractor={(item) => item.id}
-      />
-    </View>
-  );
-};
+// const Reports = () => {
+//   return (
+//     <View>
+//       <FlatList
+//         data={ReportsData}
+//         renderItem={({ item }) => (
+//           <ReportCard
+//             title={item.title}
+//             time={item.time}
+//             user={item.user}
+//             desc={item.desc}
+//           />
+//         )}
+//         keyExtractor={(item) => item.id}
+//       />
+//     </View>
+//   );
+// };
 
-export default Reports;
+export default ReportCard;
 
 const styles = StyleSheet.create({
   container: {
